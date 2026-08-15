@@ -1,0 +1,573 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1A1B20">
+<title>Bisaya Toolkit Diagnostics</title>
+<style>
+:root{
+  --bg:#15161A;
+  --panel:#1A1B20;
+  --panel2:#202127;
+  --inner:#17181C;
+  --line:#303238;
+  --line2:#3A3C43;
+  --text:#F7F8F8;
+  --muted:#90939A;
+  --green:#7CCB69;
+  --green2:#91DA7B;
+  --greenDark:#233020;
+  --red:#FF8080;
+  --redBg:#351E1E;
+  --amber:#F3C969;
+  --blue:#7DB4FF;
+  --radius:18px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+html,body,*{scrollbar-width:none;-ms-overflow-style:none}
+*::-webkit-scrollbar{display:none;width:0;height:0}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.wrap{width:min(1180px,100%);margin:0 auto;padding:18px 16px 40px}
+.topbar{
+  position:sticky;top:0;z-index:20;
+  background:rgba(21,22,26,.93);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(255,255,255,.04)
+}
+.topinner{width:min(1180px,100%);margin:auto;padding:14px 16px;display:flex;align-items:center;gap:12px}
+.logo{
+  width:42px;height:42px;border-radius:14px;background:#222A22;border:1px solid #3D5039;
+  display:flex;align-items:center;justify-content:center;color:var(--green);font-size:20px;font-weight:900
+}
+.brand{min-width:0;flex:1}
+.brand h1{margin:0;font-size:18px;line-height:1.15}
+.brand p{margin:4px 0 0;font-size:10px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.statuspill{
+  display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:999px;
+  background:#202127;border:1px solid var(--line);font-size:10px;color:var(--muted);white-space:nowrap
+}
+.dot{width:8px;height:8px;border-radius:50%;background:#666}
+.dot.ok{background:var(--green);box-shadow:0 0 0 3px rgba(124,203,105,.12)}
+.dot.bad{background:var(--red)}
+.login{
+  margin-top:4px;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px
+}
+.loginrow{display:grid;grid-template-columns:1fr 1.35fr auto;gap:8px}
+.label{display:block;margin:0 0 7px;color:#A8ABB1;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+.field{
+  width:100%;height:46px;border-radius:13px;border:1px solid var(--line2);background:var(--inner);color:#fff;
+  padding:0 12px;outline:none
+}
+.field:focus{border-color:var(--green)}
+.btn{
+  min-height:44px;border-radius:12px;border:1px solid var(--line2);background:#25272D;color:#fff;
+  padding:0 14px;font-weight:850;font-size:11px
+}
+.btn.green{background:var(--green);border-color:var(--green);color:#10120F}
+.btn.red{background:var(--redBg);border-color:#623232;color:#FF9B9B}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.toolbar{display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap}
+.filters{display:flex;gap:7px;overflow:auto;padding:2px 0;flex:1}
+.filter{
+  min-height:38px;padding:0 12px;border-radius:11px;border:1px solid var(--line);background:var(--panel2);
+  color:#A7A9AE;font-size:10px;font-weight:850;white-space:nowrap
+}
+.filter.active{background:var(--greenDark);border-color:#557A4B;color:var(--green2)}
+.search{min-width:210px;flex:0 1 280px}
+.grid{
+  display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-top:14px
+}
+.stat{
+  background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:13px
+}
+.stat .k{font-size:9px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.07em}
+.stat .v{font-size:25px;font-weight:900;margin-top:5px}
+.stat .s{font-size:9px;color:#6F7279;margin-top:3px}
+.headrow{display:flex;align-items:end;gap:10px;margin:18px 1px 9px}
+.headrow h2{margin:0;font-size:16px}
+.headrow .count{font-size:10px;color:var(--green);font-weight:850}
+.reportlist{display:flex;flex-direction:column;gap:9px}
+.card{
+  background:var(--panel);border:1px solid var(--line);border-radius:17px;padding:14px
+}
+.cardtop{display:flex;gap:10px;align-items:flex-start}
+.code{
+  display:inline-flex;align-items:center;height:26px;padding:0 8px;border-radius:9px;background:#202C20;border:1px solid #3F6741;
+  color:var(--green2);font-size:9px;font-weight:900;letter-spacing:.05em
+}
+.cardtitle{flex:1;min-width:0}
+.cardtitle strong{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cardtitle span{display:block;font-size:9px;color:var(--muted);margin-top:4px}
+.badge{
+  padding:6px 8px;border-radius:9px;border:1px solid var(--line);background:var(--inner);
+  color:#B9BBC0;font-size:8px;font-weight:900;text-transform:uppercase
+}
+.badge.saf{color:#8FC2FF;border-color:#35506D;background:#192534}
+.badge.shizuku{color:#C2A2FF;border-color:#4B3A6D;background:#241D34}
+.badge.legacy{color:#F4CF7B;border-color:#66552D;background:#302A18}
+.details{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:11px
+}
+.detail{background:var(--inner);border:1px solid #292B31;border-radius:11px;padding:9px}
+.detail .dk{font-size:8px;color:#71747B;text-transform:uppercase;font-weight:850;letter-spacing:.06em}
+.detail .dv{font-size:10px;margin-top:4px;word-break:break-word}
+.reason{
+  margin-top:9px;padding:10px 11px;border-radius:12px;background:#18191D;border-left:3px solid var(--red);
+  color:#D7D9DD;font-size:10px;line-height:1.5;word-break:break-word
+}
+.target{margin-top:7px;color:#8B8E95;font-size:9px;line-height:1.45;word-break:break-all}
+.actions{display:flex;gap:7px;margin-top:11px;flex-wrap:wrap}
+.actions .btn{min-height:38px}
+.empty{
+  background:var(--panel);border:1px dashed #34363B;border-radius:16px;padding:34px 16px;text-align:center;color:#7D8087;font-size:11px
+}
+.toast{
+  position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(12px);
+  z-index:50;background:#22242A;border:1px solid #3E4148;color:#fff;border-radius:12px;
+  padding:11px 14px;font-size:10px;opacity:0;pointer-events:none;transition:.2s
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.modalback{
+  position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.78);display:none;align-items:center;justify-content:center;padding:16px
+}
+.modalback.show{display:flex}
+.modal{
+  width:min(620px,100%);max-height:88vh;overflow:auto;background:var(--panel2);border:1px solid var(--line2);
+  border-radius:20px;padding:17px
+}
+.modal h3{margin:0;font-size:17px}
+.modal p{font-size:10px;color:var(--muted);line-height:1.5}
+.pre{
+  white-space:pre-wrap;word-break:break-word;background:#15161A;border:1px solid #303238;border-radius:13px;
+  padding:12px;font:10px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#D8DADE
+}
+.modalactions{display:flex;gap:8px;margin-top:12px}
+.modalactions .btn{flex:1}
+@media(max-width:850px){
+  .grid{grid-template-columns:repeat(2,1fr)}
+  .details{grid-template-columns:repeat(2,1fr)}
+  .loginrow{grid-template-columns:1fr}
+  .search{flex:1 1 100%}
+}
+@media(max-width:500px){
+  .wrap{padding-left:12px;padding-right:12px}
+  .topinner{padding-left:12px;padding-right:12px}
+  .grid{grid-template-columns:repeat(2,1fr)}
+  .details{grid-template-columns:1fr 1fr}
+  .statuspill{display:none}
+}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topinner">
+    <div class="logo">B</div>
+    <div class="brand">
+      <h1>Diagnostics</h1>
+      <p>Bisaya Toolkit Admin</p>
+    </div>
+    <div class="statuspill"><span id="apiDot" class="dot"></span><span id="apiStatus">Not connected</span></div>
+  </div>
+</div>
+
+<main class="wrap">
+  <section class="login">
+    <div class="loginrow">
+      <div>
+        <span class="label">Diagnostics API Base</span>
+        <input id="apiBase" class="field" placeholder="https://YOUR-VERCEL-DOMAIN">
+      </div>
+      <div>
+        <span class="label">Admin Key</span>
+        <input id="adminKey" class="field" type="password" autocomplete="off" placeholder="DIAGNOSTICS_ADMIN_KEY">
+      </div>
+      <button id="connectBtn" class="btn green" style="align-self:end">CONNECT</button>
+    </div>
+    <div class="toolbar">
+      <div class="filters" id="filters">
+        <button class="filter active" data-filter="ALL">All</button>
+        <button class="filter" data-filter="SAF">SAF</button>
+        <button class="filter" data-filter="SHIZUKU">Shizuku</button>
+        <button class="filter" data-filter="LEGACY">Legacy</button>
+        <button class="filter" data-filter="PERMISSION">Permission</button>
+        <button class="filter" data-filter="DOWNLOAD">Download</button>
+        <button class="filter" data-filter="ZIP">ZIP</button>
+        <button class="filter" data-filter="WRITE">Write</button>
+        <button class="filter" data-filter="REPLACE">Replace</button>
+        <button class="filter" data-filter="VERIFY">Verify</button>
+      </div>
+      <input id="search" class="field search" placeholder="Search code, device, reason...">
+      <button id="refreshBtn" class="btn">REFRESH</button>
+    </div>
+  </section>
+
+  <section class="grid">
+    <div class="stat"><div class="k">Total Failures</div><div id="stTotal" class="v">0</div><div class="s">Stored reports</div></div>
+    <div class="stat"><div class="k">SAF</div><div id="stSaf" class="v">0</div><div class="s">Folder access / write</div></div>
+    <div class="stat"><div class="k">Shizuku</div><div id="stShizuku" class="v">0</div><div class="s">Binder / shell</div></div>
+    <div class="stat"><div class="k">Legacy</div><div id="stLegacy" class="v">0</div><div class="s">Android 10 below</div></div>
+    <div class="stat"><div class="k">Permission</div><div id="stPermission" class="v">0</div><div class="s">Permission failures</div></div>
+  </section>
+
+  <div class="headrow">
+    <h2>Failure Reports</h2>
+    <span id="shownCount" class="count">0 shown</span>
+  </div>
+
+  <section id="reportList" class="reportlist">
+    <div class="empty">Connect to your Diagnostics API to load reports.</div>
+  </section>
+</main>
+
+<div id="detailBack" class="modalback">
+  <div class="modal">
+    <h3>Diagnostic Report</h3>
+    <p>Copy this report and paste it into ChatGPT when you want to diagnose a failed CyberTask or permission issue.</p>
+    <div id="detailPre" class="pre"></div>
+    <div class="modalactions">
+      <button id="detailClose" class="btn">CLOSE</button>
+      <button id="detailCopy" class="btn green">COPY REPORT</button>
+    </div>
+  </div>
+</div>
+
+<div id="deleteBack" class="modalback">
+  <div class="modal" style="max-width:420px">
+    <h3>Delete Report?</h3>
+    <p>This permanently removes this diagnostic report from the backend.</p>
+    <div class="modalactions">
+      <button id="deleteCancel" class="btn">CANCEL</button>
+      <button id="deleteConfirm" class="btn red">DELETE</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+
+const CONFIG={
+  listPath:"/api/diagnostics/admin/list",
+  statsPath:"/api/diagnostics/admin/stats",
+  deletePath:"/api/diagnostics/admin/delete"
+};
+
+let DATA=[];
+let ACTIVE_FILTER="ALL";
+let CURRENT_REPORT=null;
+let DELETE_ID="";
+
+function cleanBase(v){
+  return String(v||"").trim().replace(/\/+$/,"");
+}
+function esc(v){
+  return String(v??"")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#39;");
+}
+function toast(msg){
+  $("toast").textContent=msg;
+  $("toast").classList.add("show");
+  clearTimeout(toast._t);
+  toast._t=setTimeout(()=>$("toast").classList.remove("show"),2200);
+}
+function setApiState(ok,text){
+  $("apiDot").className="dot "+(ok?"ok":"bad");
+  $("apiStatus").textContent=text;
+}
+function adminHeaders(){
+  return {
+    "X-Admin-Key":$("adminKey").value.trim(),
+    "Cache-Control":"no-cache"
+  };
+}
+function formatDate(v){
+  const n=Number(v||0);
+  if(!n)return "Unknown time";
+  try{return new Date(n).toLocaleString()}catch(e){return String(v)}
+}
+function backendClass(v){
+  const x=String(v||"").toLowerCase();
+  if(x==="saf")return "saf";
+  if(x==="shizuku")return "shizuku";
+  if(x==="legacy")return "legacy";
+  return "";
+}
+function reportText(r){
+  return [
+    "BISAYA TOOLKIT DIAGNOSTIC REPORT",
+    "Report ID: "+(r.report_id||r.id||""),
+    "Code: "+(r.code||"UNKNOWN"),
+    "Category: "+(r.category||""),
+    "Backend: "+(r.backend||""),
+    "Stage: "+(r.stage||""),
+    "Progress: "+(r.progress??"")+"%",
+    "",
+    "Android: "+(r.android_version||""),
+    "SDK: "+(r.sdk??""),
+    "Device: "+[r.manufacturer,r.model].filter(Boolean).join(" "),
+    "App Version: "+(r.app_version||""),
+    "",
+    "Task Category: "+(r.task_category||""),
+    "Target Entry: "+(r.target_entry||""),
+    "Target Path: "+(r.target_path||""),
+    "",
+    "Reason: "+(r.reason||r.error||""),
+    "Exception Type: "+(r.exception_type||""),
+    "Exception: "+(r.exception||""),
+    "",
+    "Timestamp: "+formatDate(r.created_at||r.timestamp)
+  ].join("\n");
+}
+
+function normalizeReport(r){
+  return {
+    ...r,
+    report_id:r.report_id||r.id||"",
+    backend:String(r.backend||"").toUpperCase(),
+    category:String(r.category||"").toUpperCase(),
+    stage:String(r.stage||"").toUpperCase()
+  };
+}
+
+function matchReport(r){
+  const f=ACTIVE_FILTER;
+  let filterOk=true;
+  if(f!=="ALL"){
+    filterOk=
+      r.backend===f ||
+      r.category===f ||
+      r.stage===f ||
+      String(r.code||"").toUpperCase().includes(f);
+  }
+  if(!filterOk)return false;
+
+  const q=$("search").value.trim().toLowerCase();
+  if(!q)return true;
+
+  const hay=[
+    r.report_id,r.code,r.backend,r.category,r.stage,r.reason,r.error,
+    r.exception,r.exception_type,r.manufacturer,r.model,r.android_version,
+    r.sdk,r.app_version,r.task_category,r.target_entry,r.target_path
+  ].join(" ").toLowerCase();
+
+  return hay.includes(q);
+}
+
+function renderStats(stats){
+  const safeStats=stats||{};
+  const fallback={
+    total:DATA.length,
+    saf:DATA.filter(x=>x.backend==="SAF").length,
+    shizuku:DATA.filter(x=>x.backend==="SHIZUKU").length,
+    legacy:DATA.filter(x=>x.backend==="LEGACY").length,
+    permission:DATA.filter(x=>x.category==="PERMISSION" || x.stage.includes("PERMISSION")).length
+  };
+
+  $("stTotal").textContent=Number(safeStats.total??fallback.total);
+  $("stSaf").textContent=Number(safeStats.saf??fallback.saf);
+  $("stShizuku").textContent=Number(safeStats.shizuku??fallback.shizuku);
+  $("stLegacy").textContent=Number(safeStats.legacy??fallback.legacy);
+  $("stPermission").textContent=Number(safeStats.permission??fallback.permission);
+}
+
+function render(){
+  const list=DATA.filter(matchReport);
+  $("shownCount").textContent=list.length+" shown";
+
+  if(!list.length){
+    $("reportList").innerHTML='<div class="empty">No diagnostic reports match this filter.</div>';
+    renderStats(null);
+    return;
+  }
+
+  $("reportList").innerHTML=list.map(r=>{
+    const id=esc(r.report_id);
+    return `
+      <article class="card">
+        <div class="cardtop">
+          <span class="code">${esc(r.code||"UNKNOWN")}</span>
+          <div class="cardtitle">
+            <strong>${esc(r.reason||r.error||"CyberTask failed")}</strong>
+            <span>${esc(formatDate(r.created_at||r.timestamp))}</span>
+          </div>
+          <span class="badge ${backendClass(r.backend)}">${esc(r.backend||"UNKNOWN")}</span>
+        </div>
+
+        <div class="details">
+          <div class="detail"><div class="dk">Stage</div><div class="dv">${esc(r.stage||"-")}</div></div>
+          <div class="detail"><div class="dk">Android</div><div class="dv">${esc(r.android_version||"-")} • SDK ${esc(r.sdk??"-")}</div></div>
+          <div class="detail"><div class="dk">Device</div><div class="dv">${esc([r.manufacturer,r.model].filter(Boolean).join(" ")||"-")}</div></div>
+          <div class="detail"><div class="dk">Progress</div><div class="dv">${esc(r.progress??0)}%</div></div>
+        </div>
+
+        <div class="reason">${esc(r.exception||r.reason||r.error||"No reason supplied")}</div>
+        ${r.target_entry||r.target_path?`<div class="target">Target: ${esc(r.target_entry||r.target_path)}</div>`:""}
+
+        <div class="actions">
+          <button class="btn green" onclick="openReport('${id}')">COPY / VIEW REPORT</button>
+          <button class="btn red" onclick="askDelete('${id}')">DELETE</button>
+        </div>
+      </article>`;
+  }).join("");
+
+  renderStats(null);
+}
+
+async function fetchJson(url,options={}){
+  const r=await fetch(url,{
+    cache:"no-store",
+    ...options
+  });
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(j.error||("HTTP "+r.status));
+  return j;
+}
+
+async function loadReports(){
+  const base=cleanBase($("apiBase").value);
+  const key=$("adminKey").value.trim();
+
+  if(!base){toast("Enter your Diagnostics API base URL.");return}
+  if(!key){toast("Enter the admin key.");return}
+
+  $("connectBtn").disabled=true;
+  $("refreshBtn").disabled=true;
+  setApiState(false,"Connecting...");
+
+  try{
+    const listData=await fetchJson(base+CONFIG.listPath,{
+      headers:adminHeaders()
+    });
+
+    const raw=Array.isArray(listData)
+      ?listData
+      :(listData.reports||listData.items||[]);
+
+    DATA=raw.map(normalizeReport).sort((a,b)=>
+      Number(b.created_at||b.timestamp||0)-Number(a.created_at||a.timestamp||0)
+    );
+
+    let stats=null;
+    try{
+      const st=await fetchJson(base+CONFIG.statsPath,{headers:adminHeaders()});
+      stats=st.stats||st;
+    }catch(e){}
+
+    render();
+    if(stats)renderStats(stats);
+
+    localStorage.setItem("btk_diag_api_base",base);
+    sessionStorage.setItem("btk_diag_admin_key",key);
+
+    setApiState(true,"Connected");
+    toast("Diagnostics loaded.");
+  }catch(e){
+    DATA=[];
+    render();
+    setApiState(false,"Connection failed");
+    toast(e.message||"Unable to load diagnostics.");
+  }finally{
+    $("connectBtn").disabled=false;
+    $("refreshBtn").disabled=false;
+  }
+}
+
+function openReport(id){
+  const r=DATA.find(x=>String(x.report_id)===String(id));
+  if(!r)return;
+  CURRENT_REPORT=r;
+  $("detailPre").textContent=reportText(r);
+  $("detailBack").classList.add("show");
+}
+async function copyCurrent(){
+  if(!CURRENT_REPORT)return;
+  const text=reportText(CURRENT_REPORT);
+  try{
+    await navigator.clipboard.writeText(text);
+    toast("Report copied.");
+  }catch(e){
+    const ta=document.createElement("textarea");
+    ta.value=text;document.body.appendChild(ta);ta.select();
+    document.execCommand("copy");ta.remove();
+    toast("Report copied.");
+  }
+}
+function askDelete(id){
+  DELETE_ID=id;
+  $("deleteBack").classList.add("show");
+}
+async function deleteReport(){
+  if(!DELETE_ID)return;
+
+  const base=cleanBase($("apiBase").value);
+  $("deleteConfirm").disabled=true;
+
+  try{
+    await fetchJson(base+CONFIG.deletePath,{
+      method:"POST",
+      headers:{
+        ...adminHeaders(),
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({report_id:DELETE_ID})
+    });
+
+    DATA=DATA.filter(x=>String(x.report_id)!==String(DELETE_ID));
+    $("deleteBack").classList.remove("show");
+    DELETE_ID="";
+    render();
+    toast("Report deleted.");
+  }catch(e){
+    toast(e.message||"Delete failed.");
+  }finally{
+    $("deleteConfirm").disabled=false;
+  }
+}
+
+document.querySelectorAll(".filter").forEach(btn=>{
+  btn.onclick=()=>{
+    ACTIVE_FILTER=btn.dataset.filter||"ALL";
+    document.querySelectorAll(".filter").forEach(x=>x.classList.remove("active"));
+    btn.classList.add("active");
+    render();
+  };
+});
+
+$("search").oninput=render;
+$("connectBtn").onclick=loadReports;
+$("refreshBtn").onclick=loadReports;
+$("detailClose").onclick=()=>$("detailBack").classList.remove("show");
+$("detailCopy").onclick=copyCurrent;
+$("deleteCancel").onclick=()=>{
+  DELETE_ID="";
+  $("deleteBack").classList.remove("show");
+};
+$("deleteConfirm").onclick=deleteReport;
+
+$("detailBack").onclick=e=>{
+  if(e.target===$("detailBack"))$("detailBack").classList.remove("show");
+};
+$("deleteBack").onclick=e=>{
+  if(e.target===$("deleteBack")){
+    DELETE_ID="";
+    $("deleteBack").classList.remove("show");
+  }
+};
+
+const savedBase=localStorage.getItem("btk_diag_api_base")||"";
+const sessionKey=sessionStorage.getItem("btk_diag_admin_key")||"";
+$("apiBase").value=savedBase;
+$("adminKey").value=sessionKey;
+if(savedBase && sessionKey)setTimeout(loadReports,120);
+</script>
+</body>
+</html>
